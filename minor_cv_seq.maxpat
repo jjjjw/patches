@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 194.0, 185.0, 760.0, 560.0 ],
+		"rect" : [ 217.0, 198.0, 760.0, 560.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
 				"box" : 				{
@@ -176,8 +176,8 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "signal" ],
-					"patching_rect" : [ 30.0, 195.0, 119.0, 22.0 ],
-					"text" : "phasor~ 1.0.0 @lock"
+					"patching_rect" : [ 32.0, 195.0, 129.0, 22.0 ],
+					"text" : "phasor~ 1.0.0 @lock 1"
 				}
 
 			}
