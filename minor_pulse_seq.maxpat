@@ -10,17 +10,154 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 185.0, 188.0, 899.0, 601.0 ],
+		"rect" : [ 185.0, 188.0, 1283.0, 725.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-20",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 2,
+					"outlettype" : [ "signal", "" ],
+					"patcher" : 					{
+						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 9,
+							"minor" : 0,
+							"revision" : 3,
+							"architecture" : "x64",
+							"modernui" : 1
+						}
+,
+						"classnamespace" : "box",
+						"rect" : [ 59.0, 119.0, 1000.0, 780.0 ],
+						"gridsize" : [ 15.0, 15.0 ],
+						"visible" : 1,
+						"boxes" : [ 							{
+								"box" : 								{
+									"comment" : "semitone value (int or float, e.g. 0, 2, 12, -5)",
+									"id" : "obj-1",
+									"index" : 1,
+									"maxclass" : "inlet",
+									"numinlets" : 0,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 50.0, 30.0, 30.0, 30.0 ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-2",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 50.0, 90.0, 140.0, 22.0 ],
+									"text" : "expr $f1 * 0.0905 / 12."
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-3",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "signal" ],
+									"patching_rect" : [ 50.0, 150.0, 33.0, 22.0 ],
+									"text" : "sig~"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"comment" : "CV signal out (connect to dac~ channel for A-110-2)",
+									"id" : "obj-4",
+									"index" : 1,
+									"maxclass" : "outlet",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 50.0, 220.0, 30.0, 30.0 ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"comment" : "float value (for monitoring/debugging)",
+									"id" : "obj-5",
+									"index" : 2,
+									"maxclass" : "outlet",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 210.0, 220.0, 30.0, 30.0 ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-6",
+									"linecount" : 3,
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 210.0, 80.0, 256.0, 47.0 ],
+									"text" : "A-110-2 calibration: 0.0905 signal units per octave, so one semitone = 0.0905 / 12 = 0.00754167. Positive semitones = positive CV."
+								}
+
+							}
+ ],
+						"lines" : [ 							{
+								"patchline" : 								{
+									"destination" : [ "obj-2", 0 ],
+									"source" : [ "obj-1", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-3", 0 ],
+									"order" : 1,
+									"source" : [ "obj-2", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-5", 0 ],
+									"order" : 0,
+									"source" : [ "obj-2", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-4", 0 ],
+									"source" : [ "obj-3", 0 ]
+								}
+
+							}
+ ],
+						"originid" : "pat-110"
+					}
+,
+					"patching_rect" : [ 235.0, 674.0, 90.0, 22.0 ],
+					"saved_object_attributes" : 					{
+						"globalpatchername" : ""
+					}
+,
+					"text" : "p voltage_table"
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"id" : "obj-76",
 					"linecount" : 2,
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1181.0, 125.0, 240.0, 33.0 ],
-					"presentation_linecount" : 2,
+					"patching_rect" : [ 1181.0, 125.0, 242.0, 33.0 ],
 					"text" : "accents — semitones that output an accent gate"
 				}
 
@@ -110,7 +247,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 786.859375, 733.0, 200.0, 33.0 ],
-					"presentation_linecount" : 2,
 					"text" : "root-note gate (step semitone == 0, gated by note/rest + width)"
 				}
 
@@ -733,7 +869,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 774.0, 541.5, 280.0, 47.0 ],
-					"presentation_linecount" : 3,
 					"text" : "per-step gate (sub-ramp < width) multiplied by the note/rest flag from buffer~ gates — sent straight to ch 2 for the ES-10 / rack envelope"
 				}
 
@@ -1094,7 +1229,7 @@
 
 			}
  ],
-		"originid" : "pat-76",
+		"originid" : "pat-104",
 		"dependency_cache" : [  ],
 		"autosave" : 0
 	}
