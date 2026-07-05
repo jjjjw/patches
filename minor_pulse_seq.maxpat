@@ -10,9 +10,135 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 177.0, 197.0, 899.0, 601.0 ],
+		"rect" : [ 185.0, 188.0, 899.0, 601.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-76",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1181.0, 125.0, 240.0, 33.0 ],
+					"presentation_linecount" : 2,
+					"text" : "accents — semitones that output an accent gate"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-77",
+					"maxclass" : "textedit",
+					"numinlets" : 1,
+					"numoutlets" : 4,
+					"outlettype" : [ "", "int", "", "" ],
+					"parameter_enable" : 0,
+					"patching_rect" : [ 1181.0, 167.30078125, 240.0, 24.0 ],
+					"text" : "0 1 5"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-78",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 1181.0, 201.30078125, 97.0, 22.0 ],
+					"text" : "prepend accents"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-75",
+					"maxclass" : "newobj",
+					"numinlets" : 2,
+					"numoutlets" : 2,
+					"outlettype" : [ "signal", "signal" ],
+					"patching_rect" : [ 341.5, 434.0, 89.0, 22.0 ],
+					"text" : "index~ accents"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-63",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 2,
+					"outlettype" : [ "float", "bang" ],
+					"patching_rect" : [ 783.0, 474.0, 107.0, 22.0 ],
+					"text" : "buffer~ accents 10"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-61",
+					"maxclass" : "newobj",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "signal" ],
+					"patching_rect" : [ 331.0, 504.0, 29.5, 22.0 ],
+					"text" : "*~"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontface" : 0,
+					"fontname" : "Arial",
+					"fontsize" : 12.0,
+					"id" : "obj-59",
+					"maxclass" : "number~",
+					"mode" : 2,
+					"numinlets" : 2,
+					"numoutlets" : 2,
+					"outlettype" : [ "signal", "float" ],
+					"patching_rect" : [ 500.0, 434.0, 56.0, 22.0 ],
+					"sig" : 0.0
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-102",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 786.859375, 733.0, 200.0, 33.0 ],
+					"presentation_linecount" : 2,
+					"text" : "root-note gate (step semitone == 0, gated by note/rest + width)"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-40",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1105.0, 15.0, 150.0, 20.0 ],
+					"text" : "Patterns"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-37",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 1105.0, 41.0, 150.0, 33.0 ],
+					"text" : "seq 0 5 1 3 4 7\nmod 0 0 1 3"
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"id" : "obj-33",
 					"maxclass" : "comment",
@@ -112,7 +238,7 @@
 ,
 					"text" : "v8",
 					"textfile" : 					{
-						"text" : "\n// Sequence logic. Expands the step sequence, pokes SEMITONE offsets (natural\n// minor) into buffer~ steps and note/rest flags into buffer~ gates.\n//\n// tokens: integers = scale degrees, \"~\" = rest\n// steps[i] = minorSemis(seq[i % seqLen] + mods[i % modLen]), length = lcm(seqLen, modLen)\n// a \"~\" in seq OR mods makes that expanded step a rest (gate flag 0)\n//\n// messages:\n//   seq 0 2 5 4     -> base degree sequence (textedit via prepend seq)\n//   mods 0 0 1      -> cyclic degree modifiers (textedit via prepend mods)\n//\n// outlets:\n//   0: expanded list with rests shown as ~ (for print/inspection)\n//   1: step count N (drives *~ on the phasor)\n//   2: numeric viz list, rests as -15 (feeds the read-only multislider)\n\ninlets = 1;\noutlets = 3;\n\nconst OCT_DOWN = 2;\nconst OCT_UP = 3;\nconst MIN_DEG = -OCT_DOWN * 7;   // -14\nconst MAX_DEG = OCT_UP * 7;      //  21\nconst REST = \"~\";\nconst VIZ_REST = MIN_DEG - 1;    // -15, pins rests to the bottom of the viz\n\nconst MINOR = [0, 2, 3, 5, 7, 8, 10]; // natural minor semitone offsets\n\nlet seqArr = [0, 2, 5, 4];       // numbers, or null for rests\nlet modArr = [0];\nlet lastLen = 0;\n\nfunction gcd(a, b) { return b ? gcd(b, a % b) : a; }\nfunction lcm(a, b) { return (a * b) / gcd(a, b); }\nconst clampDeg = (d) => Math.max(MIN_DEG, Math.min(MAX_DEG, d));\n\n// textedit hands us symbols; message boxes hand us numbers — accept both\nfunction parseTokens(vals) {\n    if (vals[0] === \"text\") vals = vals.slice(1); // textedit prefixes output with \"text\"\n    return vals.map((v) => {\n        if (typeof v === \"number\") return Math.round(v);\n        const s = String(v);\n        if (s === REST) return null;\n        const n = Number(s);\n        return Number.isFinite(n) ? Math.round(n) : null;\n    });\n}\n\nfunction degToSemi(d) {\n    const oct = Math.floor(d / 7);\n    const step = ((d % 7) + 7) % 7;\n    return oct * 12 + MINOR[step];\n}\n\nfunction rebuild() {\n    const n = lcm(seqArr.length, modArr.length);\n    const degs = []; // number | null\n    for (let i = 0; i < n; i++) {\n        const s = seqArr[i % seqArr.length];\n        const m = modArr[i % modArr.length];\n        degs.push(s === null || m === null ? null : clampDeg(s + m));\n    }\n    const steps = new Buffer(\"steps\");\n    const gates = new Buffer(\"gates\");\n    // only resize when the expanded length actually changes\n    if (n !== lastLen) {\n        steps.send(\"sizeinsamps\", n);\n        gates.send(\"sizeinsamps\", n);\n        lastLen = n;\n    }\n    let lastSemi = 0; // rests hold the previous pitch; gate flag mutes them anyway\n    for (let i = 0; i < n; i++) {\n        const d = degs[i];\n        if (d === null) {\n            steps.poke(1, i, lastSemi);\n            gates.poke(1, i, 0);\n        } else {\n            lastSemi = degToSemi(d);\n            steps.poke(1, i, lastSemi);\n            gates.poke(1, i, 1);\n        }\n    }\n    outlet(2, degs.map((d) => (d === null ? VIZ_REST : d)));\n    outlet(1, n);\n    outlet(0, degs.map((d) => (d === null ? REST : d)));\n}\n\nfunction seq(...vals) {\n    if (vals.length) { seqArr = parseTokens(vals); rebuild(); }\n}\n\nfunction mods(...vals) {\n    if (vals.length) { modArr = parseTokens(vals); rebuild(); }\n}\n\nfunction loadbang() {\n    rebuild();\n}\n",
+						"text" : "\n// Sequence logic. Expands the step sequence, pokes SEMITONE offsets (natural\n// minor) into buffer~ steps and note/rest flags into buffer~ gates.\n//\n// tokens: integers = scale degrees, \"~\" = rest\n// steps[i] = minorSemis(seq[i % seqLen] + mods[i % modLen]), length = lcm(seqLen, modLen)\n// a \"~\" in seq OR mods makes that expanded step a rest (gate flag 0)\n//\n// messages:\n//   seq 0 2 5 4     -> base degree sequence (textedit via prepend seq)\n//   mods 0 0 1      -> cyclic degree modifiers (textedit via prepend mods)\n//\n// outlets:\n//   0: expanded list with rests shown as ~ (for print/inspection)\n//   1: step count N (drives *~ on the phasor)\n//   2: numeric viz list, rests as -15 (feeds the read-only multislider)\n\ninlets = 1;\noutlets = 3;\n\nconst OCT_DOWN = 2;\nconst OCT_UP = 3;\nconst MIN_DEG = -OCT_DOWN * 7;   // -14\nconst MAX_DEG = OCT_UP * 7;      //  21\nconst REST = \"~\";\nconst VIZ_REST = MIN_DEG - 1;    // -15, pins rests to the bottom of the viz\n\nconst MINOR = [0, 2, 3, 5, 7, 8, 10]; // natural minor semitone offsets\n\nlet seqArr = [0, 2, 5, 4];       // numbers, or null for rests\nlet modArr = [0];\nlet accentsArr = [];\nlet lastLen = 0;\n\nfunction gcd(a, b) { return b ? gcd(b, a % b) : a; }\nfunction lcm(a, b) { return (a * b) / gcd(a, b); }\nconst clampDeg = (d) => Math.max(MIN_DEG, Math.min(MAX_DEG, d));\n\n// textedit hands us symbols; message boxes hand us numbers — accept both\nfunction parseTokens(vals) {\n    if (vals[0] === \"text\") vals = vals.slice(1); // textedit prefixes output with \"text\"\n    return vals.map((v) => {\n        if (typeof v === \"number\") return Math.round(v);\n        const s = String(v);\n        if (s === REST) return null;\n        const n = Number(s);\n        return Number.isFinite(n) ? Math.round(n) : null;\n    });\n}\n\nfunction degToSemi(d) {\n    const oct = Math.floor(d / 7);\n    const step = ((d % 7) + 7) % 7;\n    return oct * 12 + MINOR[step];\n}\n\nfunction rebuild() {\n    const n = lcm(seqArr.length, modArr.length);\n    const degs = []; // number | null\n    for (let i = 0; i < n; i++) {\n        const s = seqArr[i % seqArr.length];\n        const m = modArr[i % modArr.length];\n        degs.push(s === null || m === null ? null : clampDeg(s + m));\n    }\n    const steps = new Buffer(\"steps\");\n    const gates = new Buffer(\"gates\");\n    const accents = new Buffer(\"accents\");\n    // only resize when the expanded length actually changes\n    if (n !== lastLen) {\n        steps.send(\"sizeinsamps\", n);\n        gates.send(\"sizeinsamps\", n);\n        accents.send(\"sizeinsamps\", n);\n        lastLen = n;\n    }\n    let lastSemi = 0; // rests hold the previous pitch; gate flag mutes them anyway\n    for (let i = 0; i < n; i++) {\n        const d = degs[i];\n        if (d === null) {\n            steps.poke(1, i, lastSemi);\n            gates.poke(1, i, 0);\n            accents.poke(1, i, 0);\n        } else {\n            lastSemi = degToSemi(d);\n            steps.poke(1, i, lastSemi);\n            gates.poke(1, i, 1);\n            accents.poke(1, i, accentsArr.indexOf(d) !== -1 ? 1 : 0); \n        }\n    }\n    outlet(2, degs.map((d) => (d === null ? VIZ_REST : d)));\n    outlet(1, n);\n    outlet(0, degs.map((d) => (d === null ? REST : d)));\n}\n\nfunction seq(...vals) {\n    if (vals.length) { seqArr = parseTokens(vals); rebuild(); }\n}\n\nfunction mods(...vals) {\n    if (vals.length) { modArr = parseTokens(vals); rebuild(); }\n}\n\nfunction accents(...vals) {\n    if (vals.length) { accentsArr = parseTokens(vals); rebuild(); }\n}\n\nfunction loadbang() {\n    rebuild();\n}\n",
 						"filename" : "none",
 						"flags" : 0,
 						"embed" : 1,
@@ -268,7 +394,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "float" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 105.859375, 436.0, 40.0, 40.0 ],
+					"patching_rect" : [ 105.0, 439.30078125, 40.0, 40.0 ],
 					"size" : 1.0
 				}
 
@@ -292,7 +418,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 103.80859375, 514.0, 24.0, 24.0 ],
+					"patching_rect" : [ 187.0, 494.0, 24.0, 24.0 ],
 					"svg" : ""
 				}
 
@@ -301,10 +427,10 @@
 				"box" : 				{
 					"id" : "obj-17",
 					"maxclass" : "newobj",
-					"numinlets" : 2,
+					"numinlets" : 3,
 					"numoutlets" : 0,
-					"patching_rect" : [ 33.80859375, 554.0, 68.0, 22.0 ],
-					"text" : "dac~ 15 16"
+					"patching_rect" : [ 33.80859375, 554.0, 85.0, 22.0 ],
+					"text" : "dac~ 15 16 17"
 				}
 
 			}
@@ -339,7 +465,7 @@
 					"outlettype" : [ "", "int", "", "" ],
 					"parameter_enable" : 0,
 					"patching_rect" : [ 786.859375, 47.30078125, 240.0, 24.0 ],
-					"text" : "0 5 1 3 4 7"
+					"text" : "0 5 1 3 4 10"
 				}
 
 			}
@@ -508,7 +634,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 2,
 					"outlettype" : [ "float", "bang" ],
-					"patching_rect" : [ 662.0, 465.0, 95.0, 22.0 ],
+					"patching_rect" : [ 783.0, 407.30078125, 95.0, 22.0 ],
 					"text" : "buffer~ steps 10"
 				}
 
@@ -520,7 +646,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 2,
 					"outlettype" : [ "float", "bang" ],
-					"patching_rect" : [ 662.0, 495.0, 95.0, 22.0 ],
+					"patching_rect" : [ 783.0, 437.30078125, 95.0, 22.0 ],
 					"text" : "buffer~ gates 10"
 				}
 
@@ -532,7 +658,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 2,
 					"outlettype" : [ "signal", "signal" ],
-					"patching_rect" : [ 357.09765625, 369.0, 82.0, 22.0 ],
+					"patching_rect" : [ 347.0, 360.0, 82.0, 22.0 ],
 					"text" : "index~ gates"
 				}
 
@@ -606,7 +732,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 314.859375, 465.0, 280.0, 47.0 ],
+					"patching_rect" : [ 774.0, 541.5, 280.0, 47.0 ],
 					"presentation_linecount" : 3,
 					"text" : "per-step gate (sub-ramp < width) multiplied by the note/rest flag from buffer~ gates — sent straight to ch 2 for the ES-10 / rack envelope"
 				}
@@ -632,7 +758,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-12", 0 ],
-					"order" : 2,
+					"order" : 3,
 					"source" : [ "obj-11", 0 ]
 				}
 
@@ -640,7 +766,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-50", 1 ],
-					"order" : 1,
+					"order" : 2,
 					"source" : [ "obj-11", 0 ]
 				}
 
@@ -649,6 +775,14 @@
 				"patchline" : 				{
 					"destination" : [ "obj-71", 0 ],
 					"order" : 0,
+					"source" : [ "obj-11", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-75", 0 ],
+					"order" : 1,
 					"source" : [ "obj-11", 0 ]
 				}
 
@@ -810,6 +944,22 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-17", 2 ],
+					"order" : 1,
+					"source" : [ "obj-61", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-59", 0 ],
+					"order" : 0,
+					"source" : [ "obj-61", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-41", 0 ],
 					"source" : [ "obj-62", 0 ]
 				}
@@ -853,7 +1003,37 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-17", 1 ],
+					"order" : 1,
 					"source" : [ "obj-72", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-61", 0 ],
+					"order" : 0,
+					"source" : [ "obj-72", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-61", 1 ],
+					"source" : [ "obj-75", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-78", 0 ],
+					"source" : [ "obj-77", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-4", 0 ],
+					"source" : [ "obj-78", 0 ]
 				}
 
 			}
